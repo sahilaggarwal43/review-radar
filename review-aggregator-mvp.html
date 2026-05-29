@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ReviewRadar — Company Intelligence Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0b0d10;--bg2:#13161c;--bg3:#1a1e27;--bg4:#222736;
+  --border:#2a2f3e;--border2:#353c52;
+  --text:#e8eaf0;--text2:#9aa0b8;--text3:#5c6480;
+  --accent:#4f8ef7;--accent2:#7c5cfc;--accent3:#f7934f;
+  --green:#3ecf6e;--red:#f74f6e;--amber:#f7c94f;
+  --font-display:'DM Serif Display',serif;--font:'DM Sans',sans-serif;
+  --r:12px;--r2:8px;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;min-height:100vh;overflow-x:hidden}
+nav{display:flex;align-items:center;justify-content:space-between;padding:13px 28px;border-bottom:1px solid var(--border);background:rgba(11,13,16,.96);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:10px}
+.logo{font-family:var(--font-display);font-size:20px;letter-spacing:-.5px}.logo span{color:var(--accent)}
+.nav-tabs{display:flex;gap:3px}
+.nav-tab{padding:6px 14px;border-radius:var(--r2);font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;border:none;background:none;transition:all .2s;white-space:nowrap}
+.nav-tab:hover{color:var(--text);background:var(--bg3)}.nav-tab.active{color:var(--text);background:var(--bg3)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.view{display:none}.view.active{display:block}
+
+/* ── CRITERIA PICKER ── */
+.criteria-band{background:linear-gradient(135deg,var(--bg2) 0%,#0f1420 100%);border-bottom:1px solid var(--border);padding:18px 28px 20px}
+.cb-inner{max-width:1100px;margin:0 auto}
+.cb-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.cb-title{font-size:13px;font-weight:600;color:var(--text2)}
+.cb-title span{color:var(--accent)}
+.cb-subtitle{font-size:11px;color:var(--text3);margin-top:2px}
+.cb-reset{font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;padding:4px 10px;border-radius:20px;border:1px solid var(--border);font-family:var(--font);transition:all .15s}
+.cb-reset:hover{border-color:var(--accent);color:var(--accent)}
+.criteria-grid{display:flex;flex-wrap:wrap;gap:8px}
+.crit-pill{display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:40px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;transition:all .22s;user-select:none;font-size:13px;color:var(--text2);position:relative}
+.crit-pill:hover{border-color:var(--border2);color:var(--text);transform:translateY(-1px)}
+.crit-pill.selected{border-color:var(--accent);background:rgba(79,142,247,.12);color:var(--text);box-shadow:0 0 12px rgba(79,142,247,.2)}
+.crit-pill.selected .crit-icon{filter:none}
+.crit-icon{font-size:15px;line-height:1}
+.crit-label{font-weight:500}
+.crit-check{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .18s;font-size:9px}
+.crit-pill.selected .crit-check{background:var(--accent);border-color:var(--accent);color:#fff}
+.cb-active-hint{margin-top:12px;font-size:11px;color:var(--text3);display:flex;align-items:center;gap:6px}
+.cb-active-hint strong{color:var(--accent)}
+
+/* ── AGENT ── */
+.agent-hero{padding:32px 28px 18px;max-width:860px;margin:0 auto}
+.agent-hero h1{font-family:var(--font-display);font-size:32px;line-height:1.15;margin-bottom:7px}
+.agent-hero h1 em{font-style:italic;color:var(--accent)}
+.agent-hero p{color:var(--text2);font-size:14px;line-height:1.6;max-width:520px}
+.agent-panel{max-width:860px;margin:0 auto;padding:0 28px 40px}
+.input-row{display:flex;gap:10px;margin-bottom:22px}
+.search-input{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:11px 15px;color:var(--text);font-family:var(--font);font-size:14px;outline:none;transition:border-color .2s}
+.search-input:focus{border-color:var(--accent)}.search-input::placeholder{color:var(--text3)}
+.btn-crawl{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;padding:11px 22px;border-radius:var(--r);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-crawl:hover{transform:translateY(-1px);box-shadow:0 4px 18px rgba(79,142,247,.3)}.btn-crawl:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.agent-log{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:22px}
+.log-header{display:flex;align-items:center;justify-content:space-between;padding:10px 15px;border-bottom:1px solid var(--border);background:var(--bg3)}
+.log-title{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:8px}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.4s infinite}
+.pulse.idle{background:var(--text3);animation:none}.pulse.done{background:var(--green);animation:none}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+.log-body{padding:11px 15px;font-family:'Courier New',monospace;font-size:12px;line-height:1.8;max-height:200px;overflow-y:auto;color:var(--text2)}
+.log-line{display:flex;gap:10px;animation:fadein .3s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+.log-ts{color:var(--text3);min-width:52px}.log-src{min-width:80px}
+.log-src.g{color:#4285f4}.log-src.gl{color:#0f9d58}.log-src.in{color:#0a66c2}.log-src.tw{color:#1da1f2}.log-src.re{color:#ff4500}.log-src.tr{color:var(--accent3)}.log-src.ag{color:var(--accent2)}
+.log-msg{color:var(--text)}.log-count{font-size:11px;font-weight:600;color:var(--text3);background:var(--bg4);padding:2px 9px;border-radius:20px}
+.progress-wrap{margin-bottom:22px}
+.progress-label{display:flex;justify-content:space-between;margin-bottom:7px;font-size:12px;color:var(--text2)}
+.progress-bar{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;width:0%;transition:width .4s ease}
+.sources-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:9px;margin-bottom:22px}
+.source-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px;transition:all .2s}
+.source-card.crawling{border-color:var(--accent);box-shadow:0 0 10px rgba(79,142,247,.15)}
+.source-card.done{border-color:var(--green);box-shadow:0 0 10px rgba(62,207,110,.1)}
+.source-card.pending{opacity:.4}
+.sc-name{font-size:11px;font-weight:600;margin-bottom:3px}.sc-count{font-size:19px;font-weight:600;line-height:1}
+.sc-label{font-size:10px;color:var(--text3);margin-top:1px}.sc-status{font-size:10px;margin-top:6px;display:flex;align-items:center;gap:4px}
+.sc-status.crawling{color:var(--accent)}.sc-status.done{color:var(--green)}.sc-status.pending{color:var(--text3)}
+.dot-spin{width:6px;height:6px;border-radius:50%;border:1.5px solid currentColor;border-top-color:transparent;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* profile card */
+.profile-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;display:none}
+.profile-card.show{display:block}
+.pc-header{padding:20px 22px;background:linear-gradient(135deg,var(--bg3),var(--bg4));border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px}
+.pc-identity{display:flex;align-items:center;gap:13px}
+.pc-logo{width:46px;height:46px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#fff;flex-shrink:0}
+.pc-name{font-size:17px;font-weight:600}.pc-meta{font-size:12px;color:var(--text3);margin-top:3px}
+.pc-stats{display:flex;gap:18px;flex-wrap:wrap}
+.pc-stat{text-align:center}.pc-stat-num{font-size:21px;font-weight:600;line-height:1}.pc-stat-label{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* criteria highlights on profile */
+.pc-criteria-section{padding:16px 22px;border-bottom:1px solid var(--border);background:rgba(79,142,247,.04)}
+.pc-criteria-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.pc-crit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
+.pc-crit-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:11px 13px;display:flex;align-items:center;justify-content:space-between}
+.pc-crit-card.highlight{border-color:var(--accent);background:rgba(79,142,247,.08)}
+.pc-crit-left{display:flex;align-items:center;gap:7px}
+.pc-crit-icon{font-size:14px}.pc-crit-name{font-size:12px;font-weight:500;color:var(--text2)}
+.pc-crit-score{font-size:15px;font-weight:700}
+.pc-crit-bar{height:3px;background:var(--bg4);border-radius:2px;margin-top:5px;overflow:hidden}
+.pc-crit-fill{height:100%;border-radius:2px;transition:width 1s ease}
+.highlight-badge{font-size:9px;font-weight:700;padding:1px 6px;border-radius:20px;background:rgba(79,142,247,.2);color:var(--accent);border:1px solid rgba(79,142,247,.35);white-space:nowrap}
+
+.pc-body{padding:18px 22px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:560px){.pc-body{grid-template-columns:1fr}}
+.pc-section{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:14px}
+.pc-section-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:11px}
+.star-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-size:13px}
+.star-label{color:var(--text2);min-width:110px}
+.star-bar{flex:1;height:5px;background:var(--bg4);border-radius:3px;margin:0 10px;overflow:hidden}
+.star-fill{height:100%;border-radius:3px;transition:width 1s ease}.star-val{min-width:26px;text-align:right;font-weight:600}
+.overall-score{display:flex;align-items:center;gap:10px;margin-bottom:13px}
+.big-score{font-size:42px;font-weight:300;font-family:var(--font-display);line-height:1}
+.stars-visual{font-size:14px}
+.sentiment-row{display:flex;gap:7px;margin-bottom:11px}
+.senti{flex:1;background:var(--bg4);border-radius:var(--r2);padding:8px;text-align:center}
+.senti-num{font-size:16px;font-weight:600}
+.senti-num.pos{color:var(--green)}.senti-num.neu{color:var(--amber)}.senti-num.neg{color:var(--red)}
+.senti-label{font-size:10px;color:var(--text3);margin-top:2px}
+.src-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12px}
+.src-name{min-width:88px}.src-bar-wrap{flex:1;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.src-bar-fill{height:100%;border-radius:3px}.src-count{min-width:32px;text-align:right;font-weight:500}
+.profile-reviews-header{display:flex;align-items:center;justify-content:space-between;padding:0 22px 13px;flex-wrap:wrap;gap:10px}
+.profile-reviews-header span{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3)}
+.view-all-btn{font-size:12px;color:var(--accent);background:none;border:none;cursor:pointer;padding:0}
+.view-all-btn:hover{text-decoration:underline}
+.review-list{padding:0 22px 22px}
+
+/* ── SHARED REVIEW ITEM ── */
+.review-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:15px;margin-bottom:10px;transition:border-color .2s}
+.review-item:hover{border-color:var(--border2)}
+.ri-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:7px;flex-wrap:wrap}
+.ri-left{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.ri-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;background:var(--bg4);white-space:nowrap}
+.ri-badge.g{color:#4285f4;border:1px solid #4285f430}.ri-badge.gl{color:#0f9d58;border:1px solid #0f9d5830}
+.ri-badge.in{color:#0a66c2;border:1px solid #0a66c230}.ri-badge.re{color:#ff4500;border:1px solid #ff450030}
+.ri-badge.tr{color:var(--accent3);border:1px solid rgba(247,147,79,.3)}.ri-badge.tw{color:#1da1f2;border:1px solid #1da1f230}
+.ri-company-badge{font-size:10px;padding:2px 8px;border-radius:20px;background:var(--bg4);color:var(--text2);border:1px solid var(--border);white-space:nowrap}
+.ri-author{font-size:12px;font-weight:600;color:var(--text)}.ri-role{font-size:11px;color:var(--text3)}
+.ri-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.ri-stars{color:var(--amber);font-size:12px;letter-spacing:.5px;white-space:nowrap}
+.ri-sentiment{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px}
+.ri-sentiment.pos{background:rgba(62,207,110,.1);color:var(--green);border:1px solid rgba(62,207,110,.25)}
+.ri-sentiment.neu{background:rgba(247,201,79,.1);color:var(--amber);border:1px solid rgba(247,201,79,.25)}
+.ri-sentiment.neg{background:rgba(247,79,110,.1);color:var(--red);border:1px solid rgba(247,79,110,.25)}
+.ri-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
+.ri-body{font-size:13px;color:var(--text2);line-height:1.65}
+.ri-footer{display:flex;align-items:center;justify-content:space-between;margin-top:9px;flex-wrap:wrap;gap:7px}
+.ri-tags{display:flex;gap:5px;flex-wrap:wrap}
+.ri-tag{font-size:10px;padding:2px 7px;border-radius:20px;background:var(--bg4);color:var(--text3);border:1px solid var(--border)}
+.ri-tag.match{background:rgba(79,142,247,.12);color:var(--accent);border-color:rgba(79,142,247,.3)}
+.ri-date{font-size:11px;color:var(--text3)}
+.ri-criteria-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.ri-crit-tag{font-size:10px;padding:2px 7px;border-radius:20px;border:1px solid;display:flex;align-items:center;gap:4px}
+
+/* ── REVIEWS VIEW ── */
+.reviews-layout{display:grid;grid-template-columns:240px 1fr;gap:0;min-height:calc(100vh - 53px)}
+@media(max-width:700px){.reviews-layout{grid-template-columns:1fr}}
+.reviews-sidebar{border-right:1px solid var(--border);padding:18px 16px;background:var(--bg);position:sticky;top:53px;height:calc(100vh - 53px);overflow-y:auto}
+@media(max-width:700px){.reviews-sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border)}}
+.sidebar-section{margin-bottom:20px}
+.sidebar-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:9px}
+.sidebar-search{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:8px 11px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;transition:border-color .2s}
+.sidebar-search:focus{border-color:var(--accent)}.sidebar-search::placeholder{color:var(--text3)}
+.filter-chip{display:flex;align-items:center;justify-content:space-between;padding:6px 9px;border-radius:var(--r2);cursor:pointer;transition:all .15s;font-size:12px;color:var(--text2);border:1px solid transparent;margin-bottom:3px;user-select:none}
+.filter-chip:hover{background:var(--bg3);color:var(--text)}.filter-chip.active{background:var(--bg3);border-color:var(--border2);color:var(--text)}
+.filter-chip.active .chip-dot{opacity:1}.chip-dot{width:6px;height:6px;border-radius:50%;opacity:0;flex-shrink:0;transition:opacity .15s}
+.star-filter{display:flex;flex-direction:column;gap:3px}
+.star-filter-row{display:flex;align-items:center;gap:7px;cursor:pointer;padding:4px 7px;border-radius:var(--r2);transition:background .15s;user-select:none;font-size:12px}
+.star-filter-row:hover{background:var(--bg3)}.star-filter-row.active{background:var(--bg3)}
+.star-filter-row input{cursor:pointer;accent-color:var(--accent)}
+.sfc-stars{color:var(--amber);font-size:12px;letter-spacing:.5px}.sfc-count{font-size:11px;color:var(--text3);margin-left:auto}
+.clear-filters-btn{width:100%;background:none;border:1px solid var(--border);border-radius:var(--r2);padding:7px;font-size:12px;color:var(--text3);cursor:pointer;transition:all .15s;font-family:var(--font)}
+.clear-filters-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* criteria in sidebar */
+.sidebar-crit-grid{display:flex;flex-wrap:wrap;gap:5px}
+.sb-crit{font-size:11px;padding:4px 9px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:4px;color:var(--text2)}
+.sb-crit:hover{border-color:var(--border2);color:var(--text)}.sb-crit.active{border-color:var(--accent);background:rgba(79,142,247,.1);color:var(--accent)}
+
+.reviews-main{padding:18px 22px 40px;min-width:0}
+.reviews-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.reviews-title{font-family:var(--font-display);font-size:21px}.reviews-meta{font-size:12px;color:var(--text3);margin-top:2px}
+.sort-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.sort-label{font-size:12px;color:var(--text3)}
+.sort-select{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:6px 10px;color:var(--text);font-family:var(--font);font-size:12px;outline:none;cursor:pointer}
+.active-filters-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.af-chip{display:flex;align-items:center;gap:5px;font-size:11px;padding:3px 8px;border-radius:20px;background:rgba(79,142,247,.1);color:var(--accent);border:1px solid rgba(79,142,247,.3);cursor:pointer}
+.af-chip:hover{background:rgba(79,142,247,.18)}.af-x{font-size:13px;line-height:1}
+.reviews-list-wrap{min-height:300px}
+.load-more-btn{width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);font-size:13px;color:var(--text2);cursor:pointer;transition:all .2s;margin-top:5px;font-family:var(--font)}
+.load-more-btn:hover{border-color:var(--accent);color:var(--accent)}
+.no-results{text-align:center;padding:44px 20px;color:var(--text3)}
+.no-results h3{font-size:15px;color:var(--text2);margin-bottom:5px;font-family:var(--font-display)}
+
+/* ── DASHBOARD ── */
+.dash-header{padding:24px 28px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px}
+.dash-header h2{font-family:var(--font-display);font-size:23px}
+.dash-filters{display:flex;gap:6px;flex-wrap:wrap}
+.filter-btn{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:5px 12px;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .2s}
+.filter-btn:hover{border-color:var(--accent);color:var(--accent)}.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.company-grid{padding:0 28px 40px;display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:13px}
+.cg-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:17px;cursor:pointer;transition:all .22s;position:relative;overflow:hidden}
+.cg-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 6px 26px rgba(79,142,247,.12)}
+.cg-top{display:flex;align-items:center;gap:11px;margin-bottom:11px}
+.cg-logo{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0}
+.cg-name{font-size:14px;font-weight:600}.cg-industry{font-size:11px;color:var(--text3);margin-top:2px}
+.cg-score{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.cg-score-num{font-size:19px;font-weight:600;line-height:1}.cg-score-stars{color:var(--amber);font-size:11px}.cg-score-count{font-size:11px;color:var(--text3)}
+.cg-stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+.cg-mini-stat{background:var(--bg3);border-radius:var(--r2);padding:8px;text-align:center}
+.cg-mini-num{font-size:12px;font-weight:600}
+.cg-mini-num.pos{color:var(--green)}.cg-mini-num.neg{color:var(--red)}.cg-mini-num.neu{color:var(--text)}
+.cg-mini-label{font-size:10px;color:var(--text3);margin-top:1px}
+
+/* criteria badges on dashboard card */
+.cg-criteria-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.cg-crit-badge{font-size:10px;padding:3px 8px;border-radius:20px;background:var(--bg4);border:1px solid var(--border);display:flex;align-items:center;gap:4px;color:var(--text3)}
+.cg-crit-badge.strong{background:rgba(62,207,110,.08);border-color:rgba(62,207,110,.25);color:var(--green)}
+.cg-crit-badge.avg{background:rgba(247,201,79,.08);border-color:rgba(247,201,79,.25);color:var(--amber)}
+.cg-crit-badge.weak{background:rgba(247,79,110,.08);border-color:rgba(247,79,110,.25);color:var(--red)}
+
+.cg-sources-row{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
+.cg-src-badge{font-size:10px;padding:2px 6px;border-radius:20px;background:var(--bg4);border:1px solid var(--border)}
+.cg-footer{display:flex;gap:6px}
+.cg-action-btn{flex:1;padding:7px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);font-size:12px;color:var(--text2);cursor:pointer;transition:all .15s;font-family:var(--font);text-align:center}
+.cg-action-btn:hover{border-color:var(--accent);color:var(--accent)}
+.trend-badge{position:absolute;top:12px;right:12px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px}
+.trend-up{background:rgba(62,207,110,.1);color:var(--green);border:1px solid rgba(62,207,110,.25)}
+.trend-dn{background:rgba(247,79,110,.1);color:var(--red);border:1px solid rgba(247,79,110,.25)}
+.trend-ne{background:rgba(247,201,79,.1);color:var(--amber);border:1px solid rgba(247,201,79,.25)}
+
+/* criteria match score on card */
+.cg-match-bar{height:3px;background:var(--bg4);border-radius:2px;margin-bottom:10px;overflow:hidden}
+.cg-match-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--green));transition:width .6s ease}
+.cg-match-label{font-size:10px;color:var(--text3);margin-bottom:5px;display:flex;justify-content:space-between}
+
+.empty-state{text-align:center;padding:52px 28px;color:var(--text3)}
+.empty-icon{font-size:38px;margin-bottom:12px;opacity:.4}
+.empty-state h3{font-size:16px;color:var(--text2);margin-bottom:6px;font-family:var(--font-display)}
+.empty-state p{font-size:13px;line-height:1.6}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:10px 15px;font-size:13px;color:var(--text);display:flex;align-items:center;gap:8px;z-index:999;transform:translateY(80px);opacity:0;transition:all .3s;max-width:300px}
+.toast.show{transform:none;opacity:1}.toast-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Review<span>Radar</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showView('agent')">🤖 Agent</button>
+    <button class="nav-tab" onclick="showView('reviews')">💬 Reviews</button>
+    <button class="nav-tab" onclick="showView('dashboard')">📊 Dashboard</button>
+  </div>
+  <div class="nav-right">
+    <span id="dash-count" style="font-size:12px;color:var(--text3)">4 companies indexed</span>
+  </div>
+</nav>
+
+<!-- ══ CRITERIA BAND (global, shown on all views) ══ -->
+<div class="criteria-band" id="criteria-band">
+  <div class="cb-inner">
+    <div class="cb-top">
+      <div>
+        <div class="cb-title">What matters most to you? <span>Select your priorities</span></div>
+        <div class="cb-subtitle">We'll highlight how each company scores on your chosen criteria</div>
+      </div>
+      <button class="cb-reset" onclick="resetCriteria()">Reset</button>
+    </div>
+    <div class="criteria-grid" id="criteria-grid"></div>
+    <div class="cb-active-hint" id="cb-hint" style="display:none">
+      <span>🎯 Showing companies ranked by:</span><strong id="cb-hint-text"></strong>
+    </div>
+  </div>
+</div>
+
+<!-- ══ AGENT VIEW ══ -->
+<div id="view-agent" class="view active">
+  <div class="agent-hero">
+    <h1>Crawl the web.<br><em>Know your companies.</em></h1>
+    <p>Enter any company name. The agent crawls Google, Glassdoor, LinkedIn, Trustpilot, Reddit and more — then builds a unified intelligence profile.</p>
+  </div>
+  <div class="agent-panel">
+    <div class="input-row">
+      <input class="search-input" id="company-input" placeholder="e.g. Redblink, Infosys, Zomato, Amazon..." type="text" onkeydown="if(event.key==='Enter')startCrawl()"/>
+      <button class="btn-crawl" id="crawl-btn" onclick="startCrawl()">🕷 Start Crawl</button>
+    </div>
+    <div class="agent-log">
+      <div class="log-header">
+        <div class="log-title"><div class="pulse idle" id="pulse-dot"></div><span id="log-status">Agent ready — awaiting target</span></div>
+        <div class="log-count" id="log-count">0 signals</div>
+      </div>
+      <div class="log-body" id="log-body">
+        <div class="log-line"><span class="log-ts">00:00</span><span class="log-src ag">[AGENT]</span><span class="log-msg">ReviewRadar initialized. Enter a company to begin.</span></div>
+      </div>
+    </div>
+    <div class="progress-wrap" id="progress-wrap" style="display:none">
+      <div class="progress-label"><span id="prog-label">Crawling...</span><span id="prog-pct">0%</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div>
+    </div>
+    <div class="sources-grid" id="sources-grid"></div>
+    <div class="profile-card" id="profile-card"></div>
+  </div>
+</div>
+
+<!-- ══ REVIEWS VIEW ══ -->
+<div id="view-reviews" class="view">
+  <div class="reviews-layout">
+    <aside class="reviews-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Search</div>
+        <input class="sidebar-search" id="rv-search" placeholder="Keywords, topics..." oninput="applyFilters()"/>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Focus on Criteria</div>
+        <div class="sidebar-crit-grid" id="rv-crit-grid"></div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Company</div>
+        <div id="company-filters"></div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Source</div>
+        <div id="source-filters"></div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Sentiment</div>
+        <div>
+          <div class="filter-chip active" data-filter="sentiment" data-value="all" onclick="toggleSentimentFilter('all',this)"><span>All sentiments</span><div class="chip-dot" style="background:var(--text2)"></div></div>
+          <div class="filter-chip" data-filter="sentiment" data-value="pos" onclick="toggleSentimentFilter('pos',this)"><span>😊 Positive</span><div class="chip-dot" style="background:var(--green)"></div></div>
+          <div class="filter-chip" data-filter="sentiment" data-value="neu" onclick="toggleSentimentFilter('neu',this)"><span>😐 Neutral</span><div class="chip-dot" style="background:var(--amber)"></div></div>
+          <div class="filter-chip" data-filter="sentiment" data-value="neg" onclick="toggleSentimentFilter('neg',this)"><span>😤 Negative</span><div class="chip-dot" style="background:var(--red)"></div></div>
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Star Rating</div>
+        <div class="star-filter" id="star-filters"></div>
+      </div>
+      <button class="clear-filters-btn" onclick="clearAllFilters()">✕ Clear all filters</button>
+    </aside>
+    <main class="reviews-main">
+      <div class="reviews-topbar">
+        <div><div class="reviews-title">All Reviews</div><div class="reviews-meta" id="rv-meta">Loading...</div></div>
+        <div class="sort-row">
+          <span class="sort-label">Sort by</span>
+          <select class="sort-select" id="rv-sort" onchange="applyFilters()">
+            <option value="newest">Newest first</option>
+            <option value="highest">Highest rated</option>
+            <option value="lowest">Lowest rated</option>
+            <option value="helpful">Most helpful</option>
+            <option value="criteria">Best criteria match</option>
+          </select>
+        </div>
+      </div>
+      <div class="active-filters-row" id="active-filters-row"></div>
+      <div class="reviews-list-wrap" id="rv-list"></div>
+      <button class="load-more-btn" id="load-more-btn" onclick="loadMore()" style="display:none">Load more</button>
+    </main>
+  </div>
+</div>
+
+<!-- ══ DASHBOARD VIEW ══ -->
+<div id="view-dashboard" class="view">
+  <div class="dash-header">
+    <div>
+      <h2>Company Intelligence Hub</h2>
+      <p style="color:var(--text3);font-size:12px;margin-top:3px" id="dash-sub">Unified review profiles for all indexed companies</p>
+    </div>
+    <div class="dash-filters">
+      <button class="filter-btn active" onclick="filterDash('all',this)">All</button>
+      <button class="filter-btn" onclick="filterDash('tech',this)">Technology</button>
+      <button class="filter-btn" onclick="filterDash('services',this)">Services</button>
+      <button class="filter-btn" onclick="filterDash('ecomm',this)">E-Commerce</button>
+    </div>
+  </div>
+  <div class="company-grid" id="company-grid"></div>
+</div>
+
+<div class="toast" id="toast"><div class="toast-dot" id="toast-dot"></div><span id="toast-msg"></span></div>
+
+<script>
+// ══════════════════════════════════════
+// CRITERIA DEFINITIONS
+// ══════════════════════════════════════
+const CRITERIA = [
+  {id:'salary',       label:'Salary',          icon:'💰', color:'#f7c94f', keywords:['salary','pay','compensation','package','ctc','hike']},
+  {id:'promotion',    label:'Promotions',       icon:'📈', color:'#3ecf6e', keywords:['promotion','growth','advancement','career','appraisal','raise']},
+  {id:'benefits',     label:'Benefits',         icon:'🏥', color:'#4f8ef7', keywords:['benefits','health','insurance','medical','dental','maternity']},
+  {id:'perks',        label:'Perks',            icon:'🎁', color:'#a78bfa', keywords:['perks','canteen','food','gym','transport','cab','snacks','team outing']},
+  {id:'worklife',     label:'Work-Life Balance',icon:'⚖️', color:'#34d399', keywords:['work-life','balance','overtime','hours','flexible','remote','wfh']},
+  {id:'culture',      label:'Culture',          icon:'🤝', color:'#f472b6', keywords:['culture','environment','team','inclusive','diversity','friendly']},
+  {id:'management',   label:'Management',       icon:'👔', color:'#60a5fa', keywords:['management','leadership','manager','senior','boss','micromanage']},
+  {id:'learning',     label:'Learning & Growth',icon:'📚', color:'#fb923c', keywords:['learning','training','skill','course','development','mentorship','upskill']},
+  {id:'jobsecurity',  label:'Job Security',     icon:'🛡️', color:'#94a3b8', keywords:['job security','stable','layoff','secure','permanent','fired']},
+  {id:'diversity',    label:'Diversity & Inclusion',icon:'🌍',color:'#f87171',keywords:['diversity','inclusion','equal','lgbtq','women','gender','bias']},
+  {id:'remote',       label:'Remote / Hybrid',  icon:'🏠', color:'#38bdf8', keywords:['remote','hybrid','wfh','work from home','flexible','location']},
+  {id:'innovation',   label:'Innovation',       icon:'🚀', color:'#818cf8', keywords:['innovation','tech stack','modern','cutting edge','tools','tech','research']},
+];
+
+let selectedCriteria = [];
+
+// scores per company per criterion (0-5)
+const CRITERIA_SCORES = {
+  'Redblink':           {salary:3.9,promotion:4.1,benefits:4.0,perks:4.3,worklife:4.1,culture:4.3,management:4.0,learning:4.4,jobsecurity:3.8,diversity:4.2,remote:4.5,innovation:4.4},
+  'Infosys':            {salary:3.5,promotion:3.2,benefits:4.1,perks:3.8,worklife:3.2,culture:3.7,management:3.4,learning:4.3,jobsecurity:4.4,diversity:3.9,remote:3.3,innovation:3.1},
+  'Zomato':             {salary:3.9,promotion:3.7,benefits:3.8,perks:4.5,worklife:3.5,culture:4.1,management:3.8,learning:4.2,jobsecurity:3.2,diversity:4.0,remote:3.6,innovation:4.3},
+  'Tata Consultancy Services':{salary:3.6,promotion:3.1,benefits:4.2,perks:3.6,worklife:3.4,culture:3.9,management:3.7,learning:3.8,jobsecurity:4.6,diversity:3.8,remote:3.2,innovation:3.0},
+};
+
+function getCriteriaScore(companyName, criterionId){
+  const base = CRITERIA_SCORES[companyName];
+  if(base && base[criterionId] !== undefined) return base[criterionId];
+  return +(3.0 + Math.random()*1.5).toFixed(1);
+}
+
+function getMatchScore(company){
+  if(!selectedCriteria.length) return null;
+  const scores = selectedCriteria.map(id => getCriteriaScore(company.name, id));
+  return (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1);
+}
+
+// ══════════════════════════════════════
+// RENDER CRITERIA BAND
+// ══════════════════════════════════════
+function renderCriteriaBand(){
+  const grid = document.getElementById('criteria-grid');
+  grid.innerHTML = CRITERIA.map(c => `
+    <div class="crit-pill ${selectedCriteria.includes(c.id)?'selected':''}" onclick="toggleCriterion('${c.id}')">
+      <span class="crit-icon">${c.icon}</span>
+      <span class="crit-label">${c.label}</span>
+      <span class="crit-check">${selectedCriteria.includes(c.id)?'✓':''}</span>
+    </div>`).join('');
+  const hint = document.getElementById('cb-hint');
+  if(selectedCriteria.length){
+    hint.style.display='flex';
+    document.getElementById('cb-hint-text').textContent = selectedCriteria.map(id=>CRITERIA.find(c=>c.id===id)?.label).join(', ');
+  } else { hint.style.display='none'; }
+}
+
+function toggleCriterion(id){
+  const idx = selectedCriteria.indexOf(id);
+  if(idx>=0) selectedCriteria.splice(idx,1); else selectedCriteria.push(id);
+  renderCriteriaBand();
+  renderDashboard(currentDashFilter);
+  if(document.getElementById('view-reviews').classList.contains('active')){
+    buildReviewsSidebar(); applyFilters();
+  }
+  if(document.getElementById('view-agent').classList.contains('active')){
+    const pc = document.getElementById('profile-card');
+    if(pc.classList.contains('show') && currentProfileCompany){
+      renderProfileCard(currentProfileCompany);
+    }
+  }
+}
+
+function resetCriteria(){
+  selectedCriteria=[];
+  renderCriteriaBand();
+  renderDashboard(currentDashFilter);
+  if(document.getElementById('view-reviews').classList.contains('active')){buildReviewsSidebar();applyFilters();}
+}
+
+// ══════════════════════════════════════
+// DATA
+// ══════════════════════════════════════
+const SOURCES = [
+  {id:'google',    name:'Google',     color:'#4285f4',cls:'g'},
+  {id:'glassdoor', name:'Glassdoor',  color:'#0f9d58',cls:'gl'},
+  {id:'linkedin',  name:'LinkedIn',   color:'#0a66c2',cls:'in'},
+  {id:'trustpilot',name:'Trustpilot', color:'#f7934f',cls:'tr'},
+  {id:'reddit',    name:'Reddit',     color:'#ff4500',cls:'re'},
+  {id:'twitter',   name:'Twitter/X',  color:'#1da1f2',cls:'tw'},
+];
+
+const REVIEW_POOL = [
+  {sent:'positive',title:'Excellent salary and compensation package',body:'The pay here is genuinely competitive. Annual hikes are above market and they actually honour the package promised at joining. Bonus structure is transparent.',tags:['salary','compensation','hike'],criteria:['salary']},
+  {sent:'positive',title:'Amazing work-life balance',body:'Flexible hours, no weekend pressure, and the management actually respects boundaries. I leave on time every day. Hybrid model works perfectly.',tags:['work-life','flexible','hybrid'],criteria:['worklife','remote']},
+  {sent:'positive',title:'Great culture and inclusive environment',body:'One of the most welcoming places I have worked. Team events, open communication, and zero tolerance for toxic behaviour. Culture is genuinely collaborative.',tags:['culture','team','inclusive'],criteria:['culture','diversity']},
+  {sent:'positive',title:'Best perks in the industry',body:'Free meals, gym membership, transport allowance, team outings every quarter and great office facilities. The perks alone make this worth it.',tags:['perks','gym','food','transport'],criteria:['perks']},
+  {sent:'positive',title:'Fast-track promotions and career growth',body:'I was promoted twice in 18 months. The appraisal process is fair and transparent. Growth opportunities are real not just on paper.',tags:['promotion','growth','appraisal'],criteria:['promotion']},
+  {sent:'positive',title:'Comprehensive health benefits',body:'Top-tier health insurance for self and family, dental and vision coverage, generous maternity and paternity leave. Benefits package is outstanding.',tags:['benefits','health','insurance'],criteria:['benefits']},
+  {sent:'positive',title:'Exceptional learning and development programs',body:'Regular training sessions, access to Udemy and Coursera, mentorship from senior engineers, and hackathons. Skill development is taken seriously.',tags:['learning','training','mentorship'],criteria:['learning','innovation']},
+  {sent:'positive',title:'Strong job security and stability',body:'Even during tough markets the company avoided layoffs. Leadership communicates openly about business health. Very stable place to build a long career.',tags:['job security','stable','leadership'],criteria:['jobsecurity']},
+  {sent:'positive',title:'Innovative tech stack and modern tools',body:'We use cutting edge technology, regular tech talks, and freedom to explore new tools. The engineering culture values innovation over legacy.',tags:['tech','innovation','tools'],criteria:['innovation','learning']},
+  {sent:'positive',title:'Excellent remote and hybrid flexibility',body:'Fully flexible remote policy. No questions asked WFH. Async-first culture. They trust employees completely and it shows in productivity.',tags:['remote','wfh','flexible'],criteria:['remote','worklife']},
+  {sent:'neutral',title:'Salary is market average, nothing exceptional',body:'Pay is fair but not outstanding. Annual hikes are modest. Would benefit from a stronger performance bonus structure to retain top talent.',tags:['salary','hike','bonus'],criteria:['salary']},
+  {sent:'neutral',title:'Work-life balance is acceptable',body:'Most weeks are fine. Some crunches before deadlines but nothing extreme. The culture discourages unnecessary overtime but delivery pressure exists.',tags:['work-life','overtime','deadlines'],criteria:['worklife']},
+  {sent:'neutral',title:'Promotion process is slow but fair',body:'Promotions happen but not quickly. The criteria are clear at least. If you are patient and consistent, growth will come. Just not in a hurry.',tags:['promotion','growth','patience'],criteria:['promotion']},
+  {sent:'neutral',title:'Benefits are standard for the industry',body:'Health insurance is decent. Leave policy is fine. No exceptional perks but nothing missing either. Pretty much what you would expect.',tags:['benefits','insurance','leave'],criteria:['benefits','perks']},
+  {sent:'neutral',title:'Management is average, some good some bad',body:'It really depends on your team and manager. Some leaders are excellent mentors. Others are disengaged. Luck of the draw somewhat.',tags:['management','leadership','manager'],criteria:['management']},
+  {sent:'negative',title:'Salary below market, hard to justify staying',body:'Compensation has not kept up with industry. Multiple peers left for 40-50% hikes elsewhere. Negotiation is difficult and HR dismisses market data.',tags:['salary','compensation','market'],criteria:['salary']},
+  {sent:'negative',title:'Work-life balance does not exist here',body:'Constant overtime, weekend calls, and no boundary between work and personal time. Burnout is common. People look tired all the time.',tags:['work-life','burnout','overtime'],criteria:['worklife']},
+  {sent:'negative',title:'Promotions are political not merit-based',body:'Favouritism is real. Hard work alone does not get you promoted. You need to be visible to the right people. Very demotivating for genuine performers.',tags:['promotion','politics','bias'],criteria:['promotion','management']},
+  {sent:'negative',title:'Benefits are underwhelming',body:'Health insurance barely covers basics. No dental. No gym. Leave encashment is a nightmare. The benefits package is a disappointment compared to peers.',tags:['benefits','insurance','leave'],criteria:['benefits']},
+  {sent:'negative',title:'Management is toxic and micromanaging',body:'No trust in employees. Every small decision requires approval. Innovation is discouraged. Good people leave regularly because of management style.',tags:['management','micromanage','attrition'],criteria:['management','innovation']},
+];
+
+const ROLES = ['Software Engineer','Senior Developer','Product Manager','UX Designer','Data Analyst','Associate Consultant','DevOps Engineer','QA Engineer','Marketing Manager','Finance Analyst'];
+const AUTHORS_G = ['Rahul M.','Priya S.','Amit K.','Deepika R.','Sanjay P.','Nisha T.','Arjun V.','Kavitha L.'];
+const AUTHORS_GL = ['Current Employee','Former Employee','Senior Employee','Full-time Employee','Contract Staff'];
+const AUTHORS_RE = ['u/techworker_in','u/devlife_del','u/cscareer_mumbai','u/itpro_blr','u/worklife_rants'];
+const AUTHORS_TR = ['Verified Client','Business Owner','Enterprise User','Startup Founder'];
+
+function makeReviews(company, count){
+  const reviews=[];
+  const sentDist=[
+    ...Array(Math.round(count*company.sentiment.pos/100)).fill('positive'),
+    ...Array(Math.round(count*company.sentiment.neu/100)).fill('neutral'),
+    ...Array(Math.round(count*company.sentiment.neg/100)).fill('negative'),
+  ];
+  while(sentDist.length<count) sentDist.push('neutral');
+  const dates=[];
+  for(let i=0;i<count;i++){const d=new Date(2024,0,1);d.setDate(d.getDate()+Math.floor(Math.random()*540));dates.push(d);}
+  dates.sort((a,b)=>b-a);
+  for(let i=0;i<count;i++){
+    const sent=sentDist[i%sentDist.length];
+    const pool=REVIEW_POOL.filter(r=>r.sent===sent);
+    const tmpl=pool[Math.floor(Math.random()*pool.length)];
+    const srcObj=SOURCES[Math.floor(Math.random()*SOURCES.length)];
+    const stars=sent==='positive'?Math.floor(Math.random()*2)+4:sent==='negative'?Math.floor(Math.random()*2)+1:3;
+    let author='',role='';
+    if(srcObj.id==='google'){author=AUTHORS_G[Math.floor(Math.random()*AUTHORS_G.length)];role='Google Review';}
+    else if(srcObj.id==='glassdoor'){author=AUTHORS_GL[Math.floor(Math.random()*AUTHORS_GL.length)];role=ROLES[Math.floor(Math.random()*ROLES.length)]+' · '+(Math.ceil(Math.random()*5))+'yr';}
+    else if(srcObj.id==='reddit'){author=AUTHORS_RE[Math.floor(Math.random()*AUTHORS_RE.length)];role='r/cscareerquestions';}
+    else if(srcObj.id==='trustpilot'){author=AUTHORS_TR[Math.floor(Math.random()*AUTHORS_TR.length)];role='Verified Review';}
+    else if(srcObj.id==='linkedin'){author='LinkedIn Member';role=ROLES[Math.floor(Math.random()*ROLES.length)];}
+    else{author='@user'+Math.floor(Math.random()*9999);role='Twitter/X';}
+    reviews.push({
+      id:company.name.replace(/\s/g,'_')+'_'+i,
+      company:company.name,companyColor:company.color,companyInitials:company.initials,
+      src:srcObj.cls,srcName:srcObj.name,srcId:srcObj.id,
+      author,role,stars,title:tmpl.title,body:tmpl.body,tags:tmpl.tags,
+      criteria:tmpl.criteria||[],
+      sentiment:sent==='positive'?'pos':sent==='negative'?'neg':'neu',
+      date:dates[i],helpful:Math.floor(Math.random()*48),
+    });
+  }
+  return reviews;
+}
+
+const SEED_COMPANIES=[
+  {name:'Redblink',industry:'Technology / Digital Agency',sector:'tech',color:'#e74c3c',initials:'RB',overall:4.2,reviews:187,trend:'+0.3',trendDir:'up',breakdown:{culture:4.3,management:4.0,growth:4.4,worklife:4.1,compensation:3.9},sentiment:{pos:68,neu:21,neg:11},sources:{google:62,glassdoor:44,linkedin:38,trustpilot:22,reddit:13,twitter:8}},
+  {name:'Infosys',industry:'IT Services & Consulting',sector:'services',color:'#0076b6',initials:'IN',overall:3.6,reviews:12400,trend:'-0.1',trendDir:'dn',breakdown:{culture:3.7,management:3.4,growth:3.8,worklife:3.2,compensation:3.5},sentiment:{pos:51,neu:24,neg:25},sources:{google:3200,glassdoor:4100,linkedin:2800,trustpilot:1100,reddit:850,twitter:350}},
+  {name:'Zomato',industry:'Food Delivery / E-Commerce',sector:'ecomm',color:'#e23744',initials:'ZO',overall:3.9,reviews:8300,trend:'+0.2',trendDir:'up',breakdown:{culture:4.1,management:3.8,growth:4.2,worklife:3.5,compensation:3.9},sentiment:{pos:61,neu:18,neg:21},sources:{google:2800,glassdoor:1900,linkedin:1600,trustpilot:900,reddit:780,twitter:320}},
+  {name:'Tata Consultancy Services',industry:'IT Services & Consulting',sector:'services',color:'#2c3e9e',initials:'TCS',overall:3.8,reviews:28000,trend:'0.0',trendDir:'ne',breakdown:{culture:3.9,management:3.7,growth:3.6,worklife:3.4,compensation:3.6},sentiment:{pos:55,neu:22,neg:23},sources:{google:7200,glassdoor:9800,linkedin:6100,trustpilot:2800,reddit:1400,twitter:700}},
+];
+SEED_COMPANIES.forEach(c=>{c.reviewPool=makeReviews(c,30);});
+let indexedCompanies=[...SEED_COMPANIES];
+let allReviews=indexedCompanies.flatMap(c=>c.reviewPool);
+let rvFilters={search:'',companies:[],sources:[],sentiment:'all',stars:[],criteria:[]};
+let rvPage=1;
+const PAGE_SIZE=8;
+let currentDashFilter='all';
+let currentProfileCompany=null;
+
+// ══════════════════════════════════════
+// VIEW ROUTING
+// ══════════════════════════════════════
+function showView(v){
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  const tabs=document.querySelectorAll('.nav-tab');
+  const map={agent:0,reviews:1,dashboard:2};
+  if(map[v]!==undefined) tabs[map[v]].classList.add('active');
+  if(v==='reviews'){buildReviewsSidebar();applyFilters();}
+  if(v==='dashboard') renderDashboard(currentDashFilter);
+}
+
+// ══════════════════════════════════════
+// REVIEWS TAB
+// ══════════════════════════════════════
+function buildReviewsSidebar(){
+  // criteria filter
+  const rcg=document.getElementById('rv-crit-grid');
+  rcg.innerHTML=CRITERIA.map(c=>`
+    <div class="sb-crit ${rvFilters.criteria.includes(c.id)?'active':''}" onclick="toggleRvCriteria('${c.id}',this)">
+      ${c.icon} ${c.label}
+    </div>`).join('');
+  // companies
+  const cf=document.getElementById('company-filters');
+  cf.innerHTML=indexedCompanies.map(c=>`
+    <div class="filter-chip ${rvFilters.companies.includes(c.name)?'active':''}" onclick="toggleCompanyFilter('${c.name}',this)">
+      <span style="display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:50%;background:${c.color};flex-shrink:0"></span>${c.name}</span>
+      <div class="chip-dot" style="background:${c.color}"></div>
+    </div>`).join('');
+  // sources
+  const sf=document.getElementById('source-filters');
+  sf.innerHTML=SOURCES.map(s=>`
+    <div class="filter-chip ${rvFilters.sources.includes(s.id)?'active':''}" onclick="toggleSourceFilter('${s.id}',this)">
+      <span style="color:${s.color}">${s.name}</span>
+      <div class="chip-dot" style="background:${s.color}"></div>
+    </div>`).join('');
+  // stars
+  const stf=document.getElementById('star-filters');
+  stf.innerHTML=[5,4,3,2,1].map(n=>`
+    <label class="star-filter-row ${rvFilters.stars.includes(n)?'active':''}">
+      <input type="checkbox" ${rvFilters.stars.includes(n)?'checked':''} onchange="toggleStarFilter(${n},this.parentElement)"/>
+      <span class="sfc-stars">${'★'.repeat(n)}${'☆'.repeat(5-n)}</span>
+      <span class="sfc-count">${allReviews.filter(r=>r.stars===n).length}</span>
+    </label>`).join('');
+}
+
+function toggleRvCriteria(id,el){
+  const idx=rvFilters.criteria.indexOf(id);
+  if(idx>=0) rvFilters.criteria.splice(idx,1); else rvFilters.criteria.push(id);
+  el.classList.toggle('active');
+  applyFilters();
+}
+function toggleCompanyFilter(name,el){const idx=rvFilters.companies.indexOf(name);if(idx>=0)rvFilters.companies.splice(idx,1);else rvFilters.companies.push(name);el.classList.toggle('active');applyFilters();}
+function toggleSourceFilter(id,el){const idx=rvFilters.sources.indexOf(id);if(idx>=0)rvFilters.sources.splice(idx,1);else rvFilters.sources.push(id);el.classList.toggle('active');applyFilters();}
+function toggleSentimentFilter(val,el){rvFilters.sentiment=val;document.querySelectorAll('[data-filter="sentiment"]').forEach(e=>e.classList.remove('active'));el.classList.add('active');applyFilters();}
+function toggleStarFilter(n,row){const idx=rvFilters.stars.indexOf(n);if(idx>=0)rvFilters.stars.splice(idx,1);else rvFilters.stars.push(n);row.classList.toggle('active');applyFilters();}
+function clearAllFilters(){
+  rvFilters={search:'',companies:[],sources:[],sentiment:'all',stars:[],criteria:[]};
+  document.getElementById('rv-search').value='';
+  buildReviewsSidebar();
+  document.querySelectorAll('[data-filter="sentiment"]').forEach(e=>e.classList.remove('active'));
+  document.querySelector('[data-value="all"]').classList.add('active');
+  rvPage=1;applyFilters();
+}
+
+function criteriaMatchScore(review){
+  const active=[...new Set([...selectedCriteria,...rvFilters.criteria])];
+  if(!active.length) return 0;
+  return active.filter(id=>review.criteria.includes(id)).length / active.length;
+}
+
+function getFilteredReviews(){
+  let r=[...allReviews];
+  const q=(document.getElementById('rv-search')?.value||'').toLowerCase();
+  if(q) r=r.filter(rv=>rv.title.toLowerCase().includes(q)||rv.body.toLowerCase().includes(q)||rv.tags.join(' ').includes(q));
+  if(rvFilters.companies.length) r=r.filter(rv=>rvFilters.companies.includes(rv.company));
+  if(rvFilters.sources.length) r=r.filter(rv=>rvFilters.sources.includes(rv.srcId));
+  if(rvFilters.sentiment!=='all') r=r.filter(rv=>rv.sentiment===rvFilters.sentiment);
+  if(rvFilters.stars.length) r=r.filter(rv=>rvFilters.stars.includes(rv.stars));
+  // criteria filter: only show reviews mentioning those criteria
+  const activeCrit=[...new Set([...rvFilters.criteria])];
+  if(activeCrit.length) r=r.filter(rv=>activeCrit.some(id=>rv.criteria.includes(id)));
+  const sort=document.getElementById('rv-sort')?.value||'newest';
+  if(sort==='newest') r.sort((a,b)=>b.date-a.date);
+  else if(sort==='highest') r.sort((a,b)=>b.stars-a.stars);
+  else if(sort==='lowest') r.sort((a,b)=>a.stars-b.stars);
+  else if(sort==='helpful') r.sort((a,b)=>b.helpful-a.helpful);
+  else if(sort==='criteria') r.sort((a,b)=>criteriaMatchScore(b)-criteriaMatchScore(a));
+  return r;
+}
+
+function applyFilters(){rvPage=1;renderReviews();}
+function loadMore(){rvPage++;renderReviews(true);}
+
+function renderReviews(append=false){
+  const filtered=getFilteredReviews();
+  const total=filtered.length;
+  const slice=filtered.slice(0,rvPage*PAGE_SIZE);
+  const activeCrit=[...new Set([...selectedCriteria,...rvFilters.criteria])];
+  document.getElementById('rv-meta').textContent=total+' reviews'+(rvFilters.companies.length||rvFilters.sources.length||rvFilters.sentiment!=='all'||rvFilters.stars.length||rvFilters.criteria.length||rvFilters.search?' (filtered)':'');
+  // active filter chips
+  const afr=document.getElementById('active-filters-row');
+  const chips=[];
+  if(rvFilters.search) chips.push(`<span class="af-chip" onclick="clearSearch()">🔍 "${rvFilters.search}" <span class="af-x">×</span></span>`);
+  rvFilters.criteria.forEach(id=>{const cr=CRITERIA.find(c=>c.id===id);chips.push(`<span class="af-chip" onclick="removeRvCriterion('${id}')">${cr?cr.icon+' '+cr.label:id} <span class="af-x">×</span></span>`);});
+  rvFilters.companies.forEach(n=>chips.push(`<span class="af-chip" onclick="removeCompanyFilter('${n}')">${n} <span class="af-x">×</span></span>`));
+  rvFilters.sources.forEach(s=>{const src=SOURCES.find(x=>x.id===s);chips.push(`<span class="af-chip" onclick="removeSourceFilter('${s}')">${src?src.name:s} <span class="af-x">×</span></span>`);});
+  if(rvFilters.sentiment!=='all') chips.push(`<span class="af-chip" onclick="clearSentiment()">${rvFilters.sentiment==='pos'?'Positive':rvFilters.sentiment==='neg'?'Negative':'Neutral'} <span class="af-x">×</span></span>`);
+  rvFilters.stars.forEach(n=>chips.push(`<span class="af-chip" onclick="removeStarFilter(${n})">${n}★ <span class="af-x">×</span></span>`));
+  afr.innerHTML=chips.join('');
+  const list=document.getElementById('rv-list');
+  if(!append) list.innerHTML='';
+  if(!total){
+    list.innerHTML=`<div class="no-results"><div style="font-size:34px;margin-bottom:10px;opacity:.4">🔍</div><h3>No reviews match your filters</h3><p style="font-size:13px;color:var(--text3)">Try adjusting your search or clearing filters</p></div>`;
+    document.getElementById('load-more-btn').style.display='none';
+    return;
+  }
+  const sentLabel={pos:'Positive',neu:'Neutral',neg:'Negative'};
+  const toShow=append?filtered.slice((rvPage-1)*PAGE_SIZE,rvPage*PAGE_SIZE):slice;
+  toShow.forEach(r=>{
+    const d=r.date.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+    const matchCrit=r.criteria.filter(id=>activeCrit.includes(id));
+    const critTags=matchCrit.map(id=>{
+      const cr=CRITERIA.find(c=>c.id===id);
+      return cr?`<span class="ri-crit-tag" style="color:${cr.color};border-color:${cr.color}40;background:${cr.color}12">${cr.icon} ${cr.label}</span>`:'';
+    }).join('');
+    const div=document.createElement('div');
+    div.className='review-item';
+    div.innerHTML=`
+      <div class="ri-top">
+        <div class="ri-left">
+          <span class="ri-badge ${r.src}">${r.srcName}</span>
+          <span class="ri-company-badge" style="border-left:2px solid ${r.companyColor}">${r.company}</span>
+          <span class="ri-author">${r.author}</span>
+          <span class="ri-role">${r.role}</span>
+        </div>
+        <div class="ri-right">
+          <span class="ri-sentiment ${r.sentiment}">${sentLabel[r.sentiment]}</span>
+          <span class="ri-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</span>
+        </div>
+      </div>
+      <div class="ri-title">${r.title}</div>
+      <div class="ri-body">${r.body}</div>
+      ${critTags?`<div class="ri-criteria-tags">${critTags}</div>`:''}
+      <div class="ri-footer">
+        <div class="ri-tags">${r.tags.map(t=>`<span class="ri-tag ${activeCrit.some(id=>CRITERIA.find(c=>c.id===id)?.keywords.some(k=>t.includes(k)))?'match':''}">${t}</span>`).join('')}</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="ri-date">${d}</span>
+          <span style="font-size:11px;color:var(--text3)">👍 ${r.helpful}</span>
+        </div>
+      </div>`;
+    list.appendChild(div);
+  });
+  const btn=document.getElementById('load-more-btn');
+  btn.style.display=slice.length<total?'block':'none';
+  btn.textContent=`Load more (${total-slice.length} remaining)`;
+}
+
+function clearSearch(){rvFilters.search='';document.getElementById('rv-search').value='';applyFilters();}
+function removeCompanyFilter(n){const i=rvFilters.companies.indexOf(n);if(i>=0)rvFilters.companies.splice(i,1);buildReviewsSidebar();applyFilters();}
+function removeSourceFilter(s){const i=rvFilters.sources.indexOf(s);if(i>=0)rvFilters.sources.splice(i,1);buildReviewsSidebar();applyFilters();}
+function clearSentiment(){rvFilters.sentiment='all';document.querySelectorAll('[data-filter="sentiment"]').forEach(e=>e.classList.remove('active'));document.querySelector('[data-value="all"]').classList.add('active');applyFilters();}
+function removeStarFilter(n){const i=rvFilters.stars.indexOf(n);if(i>=0)rvFilters.stars.splice(i,1);buildReviewsSidebar();applyFilters();}
+function removeRvCriterion(id){const i=rvFilters.criteria.indexOf(id);if(i>=0)rvFilters.criteria.splice(i,1);buildReviewsSidebar();applyFilters();}
+
+// ══════════════════════════════════════
+// AGENT CRAWL
+// ══════════════════════════════════════
+let crawling=false,logLines=0,signalCount=0;
+function renderSourceCards(active,currentIdx=-1,counts={}){
+  const grid=document.getElementById('sources-grid');
+  grid.innerHTML=SOURCES.map((s,i)=>{
+    let status='pending',statusLabel='Pending',cnt=0;
+    if(active){if(i<currentIdx){status='done';statusLabel='Done';cnt=counts[s.id]||0}else if(i===currentIdx){status='crawling';statusLabel='Crawling...';}}
+    return `<div class="source-card ${active?status:'pending'}"><div class="sc-name" style="color:${s.color}">${s.name}</div><div class="sc-count">${cnt||'—'}</div><div class="sc-label">reviews found</div><div class="sc-status ${status}">${status==='crawling'?'<span class="dot-spin"></span>':status==='done'?'✓':'○'} ${statusLabel}</div></div>`;
+  }).join('');
+}
+
+async function startCrawl(){
+  const name=document.getElementById('company-input').value.trim();
+  if(!name){toast('Please enter a company name','amber');return;}
+  if(crawling)return;
+  crawling=true;signalCount=0;
+  document.getElementById('crawl-btn').disabled=true;
+  document.getElementById('profile-card').className='profile-card';
+  document.getElementById('progress-wrap').style.display='block';
+  document.getElementById('pulse-dot').className='pulse';
+  document.getElementById('log-status').textContent='Crawling: '+name;
+  const logEl=document.getElementById('log-body');
+  logEl.innerHTML='';logLines=0;
+  function addLog(src,msg,cls='ag'){
+    const ts=String(Math.floor(logLines/2)).padStart(2,'0')+':'+(logLines%2===0?'00':'30');
+    logEl.innerHTML+=`<div class="log-line"><span class="log-ts">${ts}</span><span class="log-src ${cls}">[${src}]</span><span class="log-msg">${msg}</span></div>`;
+    logLines++;document.getElementById('log-count').textContent=signalCount+' signals';logEl.scrollTop=logEl.scrollHeight;
+  }
+  function setProgress(pct,label){document.getElementById('prog-fill').style.width=pct+'%';document.getElementById('prog-pct').textContent=pct+'%';document.getElementById('prog-label').textContent=label;}
+  const delay=ms=>new Promise(r=>setTimeout(r,ms));
+  addLog('AGENT','Initializing crawl for: '+name,'ag');await delay(380);
+  addLog('AGENT','Resolving company entity...','ag');await delay(420);
+  addLog('AGENT','Starting multi-source pipeline.','ag');await delay(280);
+  renderSourceCards(true,0,{});
+  const fakeCounts={};
+  const srcData={google:{logs:['Querying Google Business API...','Parsing star ratings...','Extracting metadata...'],base:40},glassdoor:{logs:['Accessing Glassdoor...','Scraping employee reviews...','Parsing category scores...'],base:80},linkedin:{logs:['Querying LinkedIn profile...','Extracting sentiment posts...','Analysing connections...'],base:50},trustpilot:{logs:['Fetching Trustpilot...','Parsing verified reviews...','Extracting ratings...'],base:30},reddit:{logs:['Searching Reddit for "'+name+'"...','Scanning career subs...','Analysing threads...'],base:15},twitter:{logs:['Searching Twitter/X...','Filtering signals...','Tagging sentiment...'],base:8}};
+  for(let i=0;i<SOURCES.length;i++){
+    const s=SOURCES[i];const sd=srcData[s.id];
+    renderSourceCards(true,i,fakeCounts);
+    setProgress(Math.round((i/SOURCES.length)*85),'Crawling '+s.name+'...');
+    for(const log of sd.logs){addLog(s.name.toUpperCase(),log,s.cls);signalCount+=Math.floor(Math.random()*8)+2;document.getElementById('log-count').textContent=signalCount+' signals';await delay(340+Math.random()*260);}
+    fakeCounts[s.id]=sd.base+Math.floor(Math.random()*sd.base*.6);
+    renderSourceCards(true,i+1,fakeCounts);await delay(160);
+  }
+  setProgress(90,'AI analysis...');
+  addLog('AGENT','Running NLP sentiment pipeline...','ag');await delay(440);
+  addLog('AGENT','Classifying criteria: salary, perks, culture...','ag');await delay(420);
+  addLog('AGENT','Extracting key themes and tags...','ag');await delay(360);
+  addLog('AGENT','Deduplicating cross-source signals...','ag');await delay(340);
+  setProgress(97,'Building profile...');
+  addLog('AGENT','Calculating composite scores...','ag');await delay(340);
+  const total=Object.values(fakeCounts).reduce((a,b)=>a+b,0);
+  addLog('AGENT','✓ Done. '+total+' reviews aggregated.','ag');
+  setProgress(100,'Complete');
+  document.getElementById('pulse-dot').className='pulse done';
+  document.getElementById('log-status').textContent='Crawl complete: '+name;
+  const score=(3.4+Math.random()*1.4).toFixed(1);
+  const posP=Math.floor(45+Math.random()*30),neuP=Math.floor(15+Math.random()*15);
+  const company={
+    name,industry:guessIndustry(name),sector:'tech',
+    color:randomColor(),initials:name.split(' ').map(w=>w[0]).join('').substring(0,3).toUpperCase(),
+    overall:parseFloat(score),reviews:total,
+    trend:'+'+(Math.random()*.5).toFixed(1),trendDir:'up',
+    breakdown:{culture:+(3.2+Math.random()*1.5).toFixed(1),management:+(3.0+Math.random()*1.5).toFixed(1),growth:+(3.3+Math.random()*1.4).toFixed(1),worklife:+(2.9+Math.random()*1.6).toFixed(1),compensation:+(3.0+Math.random()*1.5).toFixed(1)},
+    sentiment:{pos:posP,neu:neuP,neg:100-posP-neuP},
+    sources:fakeCounts,
+  };
+  // assign random criteria scores
+  const csObj={};
+  CRITERIA.forEach(c=>{csObj[c.id]=+(3.0+Math.random()*1.8).toFixed(1);});
+  CRITERIA_SCORES[name]=csObj;
+  company.reviewPool=makeReviews(company,20);
+  const exists=indexedCompanies.findIndex(c=>c.name.toLowerCase()===name.toLowerCase());
+  if(exists>=0)indexedCompanies[exists]=company;else indexedCompanies.unshift(company);
+  allReviews=indexedCompanies.flatMap(c=>c.reviewPool);
+  updateDashCount();
+  currentProfileCompany=company;
+  renderProfileCard(company);
+  document.getElementById('profile-card').className='profile-card show';
+  document.getElementById('profile-card').scrollIntoView({behavior:'smooth',block:'start'});
+  crawling=false;document.getElementById('crawl-btn').disabled=false;
+  toast('Profile built · '+total+' reviews indexed','green');
+}
+
+// ══════════════════════════════════════
+// PROFILE CARD
+// ══════════════════════════════════════
+function renderProfileCard(c){
+  currentProfileCompany=c;
+  const stars=s=>'★'.repeat(Math.round(s))+'☆'.repeat(5-Math.round(s));
+  const pct=(v,max)=>Math.round((v/max)*100);
+  const maxSrc=Math.max(...Object.values(c.sources));
+  const pool=c.reviewPool||[];
+  const sampleReviews=pool.slice(0,4);
+  const card=document.getElementById('profile-card');
+
+  // build criteria section
+  const critHTML = CRITERIA.map(cr=>{
+    const score=getCriteriaScore(c.name,cr.id);
+    const isSelected=selectedCriteria.includes(cr.id);
+    const clr=score>=4.2?'var(--green)':score>=3.5?'var(--amber)':'var(--red)';
+    return `<div class="pc-crit-card ${isSelected?'highlight':''}">
+      <div>
+        <div class="pc-crit-left"><span class="pc-crit-icon">${cr.icon}</span><span class="pc-crit-name">${cr.label}</span></div>
+        <div class="pc-crit-bar"><div class="pc-crit-fill" style="width:${(score/5)*100}%;background:${clr}"></div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:5px">
+        <span class="pc-crit-score" style="color:${clr}">${score}</span>
+        ${isSelected?'<span class="highlight-badge">★ Priority</span>':''}
+      </div>
+    </div>`;
+  }).join('');
+
+  card.innerHTML=`
+    <div class="pc-header">
+      <div class="pc-identity">
+        <div class="pc-logo" style="background:${c.color}">${c.initials}</div>
+        <div><div class="pc-name">${c.name}</div><div class="pc-meta">${c.industry} · ${c.reviews.toLocaleString()} reviews</div></div>
+      </div>
+      <div class="pc-stats">
+        <div class="pc-stat"><div class="pc-stat-num" style="color:${scoreColor(c.overall)}">${c.overall}</div><div class="pc-stat-label">Overall</div></div>
+        <div class="pc-stat"><div class="pc-stat-num" style="color:var(--green)">${c.sentiment.pos}%</div><div class="pc-stat-label">Positive</div></div>
+        <div class="pc-stat"><div class="pc-stat-num">${c.reviews.toLocaleString()}</div><div class="pc-stat-label">Reviews</div></div>
+        ${selectedCriteria.length?`<div class="pc-stat"><div class="pc-stat-num" style="color:var(--accent)">${getMatchScore(c)}</div><div class="pc-stat-label">Your Match</div></div>`:''}
+      </div>
+    </div>
+    <div class="pc-criteria-section">
+      <div class="pc-criteria-title">⚙️ Criteria Scorecard ${selectedCriteria.length?'<span style="color:var(--accent);font-weight:400">(★ = your priorities)</span>':''}</div>
+      <div class="pc-crit-grid">${critHTML}</div>
+    </div>
+    <div class="pc-body">
+      <div class="pc-section">
+        <div class="pc-section-title">Category Ratings</div>
+        <div class="overall-score">
+          <div class="big-score" style="color:${scoreColor(c.overall)}">${c.overall}</div>
+          <div><div class="stars-visual" style="color:var(--amber)">${stars(c.overall)}</div><div style="font-size:11px;color:var(--text3);margin-top:3px">${c.reviews.toLocaleString()} aggregated</div></div>
+        </div>
+        ${Object.entries(c.breakdown).map(([k,v])=>`<div class="star-row"><span class="star-label">${k.charAt(0).toUpperCase()+k.slice(1)}</span><div class="star-bar"><div class="star-fill" style="width:${(v/5)*100}%;background:${scoreColor(v)}"></div></div><span class="star-val">${v}</span></div>`).join('')}
+      </div>
+      <div class="pc-section">
+        <div class="pc-section-title">Sentiment</div>
+        <div class="sentiment-row">
+          <div class="senti"><div class="senti-num pos">${c.sentiment.pos}%</div><div class="senti-label">Positive</div></div>
+          <div class="senti"><div class="senti-num neu">${c.sentiment.neu}%</div><div class="senti-label">Neutral</div></div>
+          <div class="senti"><div class="senti-num neg">${c.sentiment.neg}%</div><div class="senti-label">Negative</div></div>
+        </div>
+        <div class="pc-section-title" style="margin-top:13px">By Source</div>
+        ${SOURCES.map(s=>`<div class="src-row"><span class="src-name" style="color:${s.color}">${s.name}</span><div class="src-bar-wrap"><div class="src-bar-fill" style="width:${pct(c.sources[s.id]||0,maxSrc)}%;background:${s.color};opacity:.75"></div></div><span class="src-count">${(c.sources[s.id]||0).toLocaleString()}</span></div>`).join('')}
+      </div>
+    </div>
+    <div class="profile-reviews-header">
+      <span>Sample Reviews</span>
+      <button class="view-all-btn" onclick="viewAllForCompany('${c.name}')">View all in Reviews tab →</button>
+    </div>
+    <div class="review-list">
+      ${sampleReviews.map(r=>{
+        const sentLabel={pos:'Positive',neu:'Neutral',neg:'Negative'};
+        const d=r.date.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+        const matchCrit=r.criteria.filter(id=>selectedCriteria.includes(id));
+        const critTags=matchCrit.map(id=>{const cr=CRITERIA.find(c=>c.id===id);return cr?`<span class="ri-crit-tag" style="color:${cr.color};border-color:${cr.color}40;background:${cr.color}12">${cr.icon} ${cr.label}</span>`:''}).join('');
+        return `<div class="review-item">
+          <div class="ri-top">
+            <div class="ri-left"><span class="ri-badge ${r.src}">${r.srcName}</span><span class="ri-author">${r.author}</span><span class="ri-role">${r.role}</span></div>
+            <div class="ri-right"><span class="ri-sentiment ${r.sentiment}">${sentLabel[r.sentiment]}</span><span class="ri-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</span></div>
+          </div>
+          <div class="ri-title">${r.title}</div>
+          <div class="ri-body">${r.body}</div>
+          ${critTags?`<div class="ri-criteria-tags">${critTags}</div>`:''}
+          <div class="ri-footer">
+            <div class="ri-tags">${r.tags.map(t=>`<span class="ri-tag">${t}</span>`).join('')}</div>
+            <div style="display:flex;gap:8px;align-items:center"><span class="ri-date">${d}</span><span style="font-size:11px;color:var(--text3)">👍 ${r.helpful}</span></div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  setTimeout(()=>card.querySelectorAll('.star-fill,.src-bar-fill,.pc-crit-fill').forEach(el=>{const w=el.style.width;el.style.width='0';setTimeout(()=>el.style.width=w,60);}),130);
+}
+
+function viewAllForCompany(name){rvFilters.companies=[name];showView('reviews');}
+
+// ══════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════
+function renderDashboard(filter='all'){
+  currentDashFilter=filter;
+  const grid=document.getElementById('company-grid');
+  let list=filter==='all'?indexedCompanies:indexedCompanies.filter(c=>c.sector===filter);
+  // if criteria selected, sort by match score
+  if(selectedCriteria.length) list=[...list].sort((a,b)=>parseFloat(getMatchScore(b))-parseFloat(getMatchScore(a)));
+  const sub=document.getElementById('dash-sub');
+  if(selectedCriteria.length){
+    const labels=selectedCriteria.map(id=>CRITERIA.find(c=>c.id===id)?.label);
+    sub.innerHTML=`Ranked by your priorities: <strong style="color:var(--accent)">${labels.join(', ')}</strong>`;
+  } else { sub.textContent='Unified review profiles for all indexed companies'; }
+  if(!list.length){grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🔍</div><h3>No companies yet</h3><p>Use the Agent tab to crawl your first company.</p></div>`;return;}
+  const stars=s=>'★'.repeat(Math.round(s))+'☆'.repeat(5-Math.round(s));
+  grid.innerHTML=list.map(c=>{
+    const matchScore=getMatchScore(c);
+    const matchPct=matchScore?Math.round((parseFloat(matchScore)/5)*100):null;
+    // top 3 best criteria for this company
+    const critScores=CRITERIA.map(cr=>({...cr,score:getCriteriaScore(c.name,cr.id)})).sort((a,b)=>b.score-a.score);
+    const topCrit=critScores.slice(0,3);
+    const highlightedCrit=selectedCriteria.length?
+      CRITERIA.filter(cr=>selectedCriteria.includes(cr.id)).map(cr=>({...cr,score:getCriteriaScore(c.name,cr.id)})):topCrit;
+    return `<div class="cg-card">
+      <div class="trend-badge trend-${c.trendDir}">${c.trendDir==='up'?'↑':'↓'} ${c.trend}</div>
+      <div class="cg-top">
+        <div class="cg-logo" style="background:${c.color}">${c.initials}</div>
+        <div><div class="cg-name">${c.name}</div><div class="cg-industry">${c.industry}</div></div>
+      </div>
+      <div class="cg-score">
+        <div class="cg-score-num" style="color:${scoreColor(c.overall)}">${c.overall}</div>
+        <div class="cg-score-stars">${stars(c.overall)}</div>
+        <div class="cg-score-count">(${c.reviews.toLocaleString()})</div>
+      </div>
+      ${matchScore?`<div class="cg-match-label"><span>Your criteria match</span><span style="color:var(--accent);font-weight:600">${matchScore}/5</span></div><div class="cg-match-bar"><div class="cg-match-fill" style="width:${matchPct}%"></div></div>`:''}
+      <div class="cg-criteria-row">
+        ${highlightedCrit.map(cr=>{
+          const s=cr.score;
+          const cls=s>=4.2?'strong':s>=3.5?'avg':'weak';
+          return `<span class="cg-crit-badge ${cls}">${cr.icon} ${cr.label} ${s}</span>`;
+        }).join('')}
+      </div>
+      <div class="cg-stats-row">
+        <div class="cg-mini-stat"><div class="cg-mini-num pos">${c.sentiment.pos}%</div><div class="cg-mini-label">Positive</div></div>
+        <div class="cg-mini-stat"><div class="cg-mini-num neg">${c.sentiment.neg}%</div><div class="cg-mini-label">Negative</div></div>
+        <div class="cg-mini-stat"><div class="cg-mini-num">${c.reviews.toLocaleString()}</div><div class="cg-mini-label">Reviews</div></div>
+      </div>
+      <div class="cg-sources-row">${SOURCES.map(s=>`<span class="cg-src-badge" style="color:${s.color}">${s.name}</span>`).join('')}</div>
+      <div class="cg-footer">
+        <button class="cg-action-btn" onclick="openCompanyProfile('${c.name}')">View Profile</button>
+        <button class="cg-action-btn" onclick="viewAllForCompany('${c.name}')">See Reviews</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterDash(f,btn){document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderDashboard(f);}
+
+function openCompanyProfile(name){
+  const c=indexedCompanies.find(x=>x.name===name);if(!c)return;
+  showView('agent');
+  document.getElementById('company-input').value=name;
+  renderSourceCards(true,SOURCES.length,c.sources);
+  document.getElementById('progress-wrap').style.display='block';
+  document.getElementById('prog-fill').style.width='100%';
+  document.getElementById('prog-pct').textContent='100%';
+  document.getElementById('prog-label').textContent='Loaded from cache';
+  currentProfileCompany=c;
+  renderProfileCard(c);
+  document.getElementById('profile-card').className='profile-card show';
+  document.getElementById('log-status').textContent='Cached: '+name;
+  document.getElementById('pulse-dot').className='pulse done';
+}
+
+// ══════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════
+function updateDashCount(){document.getElementById('dash-count').textContent=indexedCompanies.length+' companies indexed';}
+function scoreColor(s){return s>=4.2?'var(--green)':s>=3.5?'var(--amber)':'var(--red)';}
+function randomColor(){return['#e74c3c','#3498db','#9b59b6','#1abc9c','#e67e22','#e91e63','#00bcd4','#ff5722','#607d8b'][Math.floor(Math.random()*9)];}
+function guessIndustry(n){n=n.toLowerCase();if(/tech|soft|dev|code|digital|web|app|data|ai/.test(n))return'Technology';if(/consult|service|solution|sys/.test(n))return'IT Services';if(/food|deliv|zom/.test(n))return'Food & Delivery';if(/bank|fin|pay/.test(n))return'Financial Services';return'Technology / Services';}
+function toast(msg,type='green'){const t=document.getElementById('toast');const colors={green:'var(--green)',amber:'var(--amber)',red:'var(--red)'};document.getElementById('toast-dot').style.background=colors[type]||colors.green;document.getElementById('toast-msg').textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+
+// ══════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════
+renderCriteriaBand();
+renderSourceCards(false);
+renderDashboard();
+updateDashCount();
+</script>
+</body>
+</html>
